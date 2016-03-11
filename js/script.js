@@ -80,10 +80,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 // *** start ***
 // On first load, show home view
+
+
 showLoading("#main-content");
 $ajaxUtils.sendGetRequest(
   allCategoriesUrl, 
-  buildAndShowHomeHTML(allCategoriesUrl), // ***** <---- TODO: STEP 1: Substitute [...] ******
+  buildAndShowHomeHTML, // ***** <---- TODO: STEP 1: Substitute [...] ******
   true); // Explicitely setting the flag to get JSON from server processed into an object literal
 });
 // *** finish **
@@ -92,15 +94,17 @@ $ajaxUtils.sendGetRequest(
 // Builds HTML for the home page based on categories array
 // returned from the server.
 function buildAndShowHomeHTML (categories) {
-  
-  // Load home snippet page
+ // Load home snippet page
+  var categoriesShortNames = [];  
+    for (var i = 0; i < categories.length; i++) {
+      categoriesShortNames.push(categories[i].short_name);
+  }
   $ajaxUtils.sendGetRequest(
     homeHtmlUrl,
     function (homeHtml) {
-      var chosenCategoryShortName = chooseRandomCategory(categories);
-      console.log(categories);
-      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml,'randomCategoryShortName',"'"+chosenCategoryShortName.toUpperCase()+"'");
-       insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
+      var chosenCategoryShortName =  chooseRandomCategory(categoriesShortNames);
+      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml,'randomCategoryShortName',"'"+chosenCategoryShortName+"'");
+      insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
     },
     false); // False here because we are getting just regular HTML from the server, so no need to process JSON.
 }
@@ -109,8 +113,8 @@ function buildAndShowHomeHTML (categories) {
 // Given array of category objects, returns a random category object.
 function chooseRandomCategory (categories) {
   // Choose a random index into the array (from 0 inclusively until array length (exclusively))
-  var randomArrayIndex = Math.floor(Math.random() * categories.length);
 
+  var randomArrayIndex = Math.floor(Math.random() * categories.length);
   // return category object with that randomArrayIndex
   return categories[randomArrayIndex];
 }
@@ -222,7 +226,8 @@ function buildAndShowMenuItemsHTML (categoryMenuItems) {
 function buildMenuItemsViewHtml(categoryMenuItems, 
                                 menuItemsTitleHtml,
                                 menuItemHtml) {
-  
+                                  
+
   menuItemsTitleHtml = 
     insertProperty(menuItemsTitleHtml,
                    "name",
